@@ -5,6 +5,36 @@ build/
 dist/
 wheels/
 *.egg-info
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
 
 # Virtual environments
 .venv
+venv/
+env/
+
+# Environment and Secrets
+.env
+.env.*
+*.secret
+*.pem
+*.key
+.ls_backups/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDEs
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs and Temps
+*.log
+/tmp/
