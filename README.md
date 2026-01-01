@@ -24,16 +24,19 @@ A CLI tool for managing Little Snitch rules on macOS, specifically optimized for
 ## Prerequisites
 
 - **macOS** with **Little Snitch** (tested with Little Snitch 5/6).
-- **Python 3.14+** (managed via `uv`).
+- **Python 3.13+** (managed via `uv`).
 - **uv**: A fast Python package installer and resolver.
 
 ## Setup
 
-The project uses `uv` for dependency management. To set up the development environment:
+The project uses `uv` for dependency management and `pre-commit` for quality assurance.
 
 ```bash
 # Sync dependencies and create virtual environment
 uv sync
+
+# Install git hooks
+uv run pre-commit install
 ```
 
 ## Usage
@@ -67,16 +70,22 @@ sudo "/Applications/Little Snitch.app/Contents/Components/littlesnitch" -u $USER
 
 ## Development
 
+### Standards
+This project follows **Spec-Driven Development (SDD)** and strict linting standards. Refer to the `.specify/memory/constitution.md` for core principles.
+
 ### Linting
-The project uses `ruff` for linting. You can run it manually:
+The project uses `ruff` for linting and formatting. You can run it manually:
 ```bash
-uv run ruff check .
+uv run ruff check .        # Linting check
+uv run ruff format .       # Auto-format code
 ```
 
 ### Git Hooks
-A pre-commit hook is installed that automatically runs `ruff check` on staged files. If the linter finds issues, the commit will be blocked until they are resolved.
+Pre-commit hooks are enforced. If you run `uv run pre-commit install`, the hooks will automatically:
+1. Run `ruff` to fix any auto-fixable linting issues.
+2. Run `ruff-format` to ensure consistent code styling.
+3. Block the commit if non-fixable issues remain.
 
-### File Structure
-- `ls_manage.py`: The core logic and CLI implementation.
-- `main.py`: Current entry point (minimal/placeholder).
-- `pyproject.toml`: Project configuration and metadata.
+### Branching & Merging
+- **Branches**: MUST use the `NNN-short-description` format.
+- **Merging**: MUST use `--no-ff` when merging to `main`.

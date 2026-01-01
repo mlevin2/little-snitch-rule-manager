@@ -1,50 +1,67 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Version change: 1.0.0 -> 1.1.0
+List of modified principles:
+  - PRINCIPLE_1_NAME: Safety First (Backups & Validation) (Unchanged)
+  - PRINCIPLE_2_NAME: CLI-First Automation (Unchanged)
+  - PRINCIPLE_3_NAME: Identity Precision (Hashing) (Unchanged)
+  - PRINCIPLE_4_NAME: Spec-Driven Development (SDD) (New - replaced Transparency/Privacy)
+  - PRINCIPLE_5_NAME: Continuous Quality (Linting & Hooks) (New - replaced Speckit Workflow Discipline)
+Added sections:
+  - Project Purpose
+  - Merge Strategy (within Development Workflow)
+Removed sections:
+  - Transparency and Privacy (Point IV)
+Templates requiring updates:
+  - ✅ updated: .specify/templates/plan-template.md
+  - ✅ updated: .specify/templates/spec-template.md
+  - ✅ updated: .specify/templates/tasks-template.md
+Follow-up TODOs:
+  - Initialize pre-commit hooks and ruff configuration.
+-->
+
+# Little Snitch Rule Manager Constitution
+
+## Project Purpose
+The Little Snitch Rule Manager is a utility designed to provide a safe, automated, and precision-focused interface for managing Little Snitch rules. It specifically addresses the challenges of maintaining network security policies for frequently updated binaries (e.g., via Homebrew) on macOS, ensuring that rule integrity is maintained through cryptographic verification.
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Safety First (Backups & Validation)
+Every modification to the Little Snitch configuration MUST be preceded by a persistent, timestamped backup. Validation of the configuration model after restoration is mandatory; if restoration fails, the system MUST automatically attempt to revert to the most recent known-good backup.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. CLI-First Automation
+All functionality MUST be exposed via a non-interactive CLI interface supporting standard I/O (stdin/args -> stdout). This ensures the tool can be safely integrated into automated system hooks, such as Homebrew post-update scripts, without requiring manual terminal intervention.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Identity Precision (Hashing)
+Rules and code requirements MUST be tied to the resolved binary hash (`fileHash`) rather than just paths or developer certificates where possible. This prevents security gaps caused by binary updates that would otherwise break existing rules or allow unauthorized binary execution.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Spec-Driven Development (SDD)
+Development MUST be driven by formal specifications. No implementation should begin without a peer-reviewed (or AI-validated) Specification and Implementation Plan. This ensures that features are built against clear requirements and that the resulting code is testable and maintainable.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Continuous Quality (Linting & Hooks)
+All code MUST adhere to the project's linting and formatting standards (e.g., Ruff). Quality checks MUST be enforced via git commit hooks (pre-commit) to prevent substandard code from entering the repository history.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technical Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **Platform**: MUST target macOS (Darwin) exclusively.
+- **Runtime**: MUST use Python 3.11+ as the primary scripting engine.
+- **Privileges**: Interactions with the Little Snitch CLI (`littlesnitch`) require `sudo` elevation.
+- **Backups**: Backups MUST be stored in a persistent user directory (`~/.ls_backups`).
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- **Branching**: Feature branches MUST use the `NNN-short-description` format (e.g., `001-add-logging`).
+- **Merge Strategy**: Feature branches MUST be merged back into `main` using the `--no-ff` (no-fast-forward) method to preserve a clear history of feature integration.
+- **Tooling**: Use `specify` and `speckit` commands for all workflow orchestration. 
+- **Commits**: Follow conventional commits (e.g., `feat:`, `fix:`, `docs:`, `chore:`).
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- **Supremacy**: This Constitution supersedes all other project documentation and practices.
+- **Amendments**: Any change to these principles requires a version bump and an update to the "Sync Impact Report."
+- **Versioning**: 
+  - MAJOR: Removal or redefinition of a core principle.
+  - MINOR: New principle/section added or materially expanded guidance.
+  - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.1.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
