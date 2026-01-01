@@ -1,5 +1,7 @@
 # Little Snitch Rule Manager
 
+[![Lint](https://github.com/mlevin2/little-snitch-rule-manager/actions/workflows/lint.yml/badge.svg)](https://github.com/mlevin2/little-snitch-rule-manager/actions/workflows/lint.yml)
+
 A CLI tool for managing Little Snitch rules on macOS, specifically optimized for handling binaries that change frequently (like those installed via Homebrew) by automating binary hash updates.
 
 ## Features
