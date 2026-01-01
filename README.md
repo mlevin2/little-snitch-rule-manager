@@ -25,7 +25,7 @@ A CLI tool for managing Little Snitch rules on macOS, specifically optimized for
 
 ## Prerequisites
 
-- **macOS** with **Little Snitch** (tested with Little Snitch 5/6).
+- **macOS** with **Little Snitch** (tested with Little Snitch 6).
 - **Python 3.13+** (managed via `uv`).
 - **uv**: A fast Python package installer and resolver.
 
