@@ -41,6 +41,9 @@ Development MUST be driven by formal specifications. No implementation should be
 ### V. Continuous Quality (Linting & Hooks)
 All code MUST adhere to the project's linting and formatting standards (e.g., Ruff). Quality checks MUST be enforced via git commit hooks (pre-commit) to prevent substandard code from entering the repository history.
 
+### VI. Reproducibility and Dependency Integrity
+Every tool, library, or utility used in the development or execution of the project MUST be explicitly declared in the project's dependency management file (`pyproject.toml`). The environment MUST be fully reproducible from a fresh clone using only declared dependencies; "global" or "system-wide" tool assumptions are prohibited.
+
 ## Technical Constraints
 
 - **Platform**: MUST target macOS (Darwin) exclusively.
@@ -64,4 +67,4 @@ All code MUST adhere to the project's linting and formatting standards (e.g., Ru
   - MINOR: New principle/section added or materially expanded guidance.
   - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 1.1.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
+**Version**: 1.2.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
