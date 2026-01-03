@@ -1,22 +1,17 @@
 <!--
-Version change: 1.0.0 -> 1.1.0
+Version change: 1.2.0 -> 1.3.0
 List of modified principles:
   - PRINCIPLE_1_NAME: Safety First (Backups & Validation) (Unchanged)
   - PRINCIPLE_2_NAME: CLI-First Automation (Unchanged)
   - PRINCIPLE_3_NAME: Identity Precision (Hashing) (Unchanged)
-  - PRINCIPLE_4_NAME: Spec-Driven Development (SDD) (New - replaced Transparency/Privacy)
-  - PRINCIPLE_5_NAME: Continuous Quality (Linting & Hooks) (New - replaced Speckit Workflow Discipline)
-Added sections:
-  - Project Purpose
-  - Merge Strategy (within Development Workflow)
-Removed sections:
-  - Transparency and Privacy (Point IV)
-Templates requiring updates:
-  - ✅ updated: .specify/templates/plan-template.md
-  - ✅ updated: .specify/templates/spec-template.md
-  - ✅ updated: .specify/templates/tasks-template.md
-Follow-up TODOs:
-  - Initialize pre-commit hooks and ruff configuration.
+  - PRINCIPLE_4_NAME: Spec-Driven Development (SDD) (Unchanged)
+  - PRINCIPLE_5_NAME: Continuous Quality (Linting, Testing & Hooks) (Expanded to include testing requirements)
+Expanded sections:
+  - Principle V: Now includes explicit testing requirements (pytest)
+  - Technical Constraints: Added Python version requirement (3.13+)
+Completed TODOs:
+  - ✅ Initialized pre-commit hooks and ruff configuration
+  - ✅ Added comprehensive test suite (pytest)
 -->
 
 # Little Snitch Rule Manager Constitution
@@ -38,8 +33,8 @@ Rules and code requirements MUST be tied to the resolved binary hash (`fileHash`
 ### IV. Spec-Driven Development (SDD)
 Development MUST be driven by formal specifications. No implementation should begin without a peer-reviewed (or AI-validated) Specification and Implementation Plan. This ensures that features are built against clear requirements and that the resulting code is testable and maintainable.
 
-### V. Continuous Quality (Linting & Hooks)
-All code MUST adhere to the project's linting and formatting standards (e.g., Ruff). Quality checks MUST be enforced via git commit hooks (pre-commit) to prevent substandard code from entering the repository history.
+### V. Continuous Quality (Linting, Testing & Hooks)
+All code MUST adhere to the project's linting and formatting standards (e.g., Ruff). All new functionality MUST include appropriate unit tests with meaningful coverage. Quality checks (linting, formatting, and tests) MUST be enforced via git commit hooks (pre-commit) to prevent substandard code from entering the repository history.
 
 ### VI. Reproducibility and Dependency Integrity
 Every tool, library, or utility used in the development or execution of the project MUST be explicitly declared in the project's dependency management file (`pyproject.toml`). The environment MUST be fully reproducible from a fresh clone using only declared dependencies; "global" or "system-wide" tool assumptions are prohibited.
@@ -47,9 +42,10 @@ Every tool, library, or utility used in the development or execution of the proj
 ## Technical Constraints
 
 - **Platform**: MUST target macOS (Darwin) exclusively.
-- **Runtime**: MUST use Python 3.11+ as the primary scripting engine.
+- **Runtime**: MUST use Python 3.13+ as the primary scripting engine.
 - **Privileges**: Interactions with the Little Snitch CLI (`littlesnitch`) require `sudo` elevation.
 - **Backups**: Backups MUST be stored in a persistent user directory (`~/.ls_backups`).
+- **Testing**: All code contributions MUST include appropriate unit tests using pytest.
 
 ## Development Workflow
 
@@ -67,4 +63,4 @@ Every tool, library, or utility used in the development or execution of the proj
   - MINOR: New principle/section added or materially expanded guidance.
   - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 1.2.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
+**Version**: 1.3.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2026-01-02

@@ -80,13 +80,34 @@ The project uses `ruff` for linting and formatting. You can run it manually:
 ```bash
 uv run ruff check .        # Linting check
 uv run ruff format .       # Auto-format code
+uv run ruff check . --fix  # Fix auto-fixable issues
 ```
 
-### Git Hooks
-Pre-commit hooks are enforced. If you run `uv run pre-commit install`, the hooks will automatically:
+### Testing
+Run tests using pytest:
+```bash
+uv run pytest              # Run all tests
+uv run pytest -v           # Run with verbose output
+uv run pytest --cov        # Run with coverage report
+uv run pytest tests/test_ls_manage.py  # Run specific test file
+```
+
+Test files are located in the `tests/` directory. Tests cover:
+- Binary hash calculation and symlink resolution
+- Code requirement lookup for Homebrew packages
+- Configuration file backup and restore
+- Rule creation and updates
+- Command execution and error handling
+
+### Git Hooks & CI/CD
+Pre-commit hooks are enforced locally. If you run `uv run pre-commit install`, the hooks will automatically:
 1. Run `ruff` to fix any auto-fixable linting issues.
 2. Run `ruff-format` to ensure consistent code styling.
 3. Block the commit if non-fixable issues remain.
+
+The GitHub Actions CI pipeline (`.github/workflows/lint.yml`) runs on all push and pull requests to `main` and performs:
+- Linting checks with `ruff check`
+- Format verification with `ruff format --check`
 
 ### Branching & Merging
 - **Branches**: MUST use the `NNN-short-description` format.
