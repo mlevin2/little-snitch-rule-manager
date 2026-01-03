@@ -5,13 +5,14 @@ List of modified principles:
   - PRINCIPLE_2_NAME: CLI-First Automation (Unchanged)
   - PRINCIPLE_3_NAME: Identity Precision (Hashing) (Unchanged)
   - PRINCIPLE_4_NAME: Spec-Driven Development (SDD) (Unchanged)
-  - PRINCIPLE_5_NAME: Continuous Quality (Linting, Testing & Hooks) (Expanded to include testing requirements)
+  - PRINCIPLE_5_NAME: Continuous Quality (Linting, Testing & Hooks) (Expanded to include TDD and coverage requirements)
 Expanded sections:
-  - Principle V: Now includes explicit testing requirements (pytest)
-  - Technical Constraints: Added Python version requirement (3.13+)
+  - Principle V: Now includes explicit testing requirements with coverage targets (80%+) and TDD encouragement
+  - Technical Constraints: Added Python version requirement (3.13+) and TDD/coverage requirements
 Completed TODOs:
   - ✅ Initialized pre-commit hooks and ruff configuration
   - ✅ Added comprehensive test suite (pytest)
+  - ✅ Added TDD and test coverage guidance
 -->
 
 # Little Snitch Rule Manager Constitution
@@ -34,7 +35,7 @@ Rules and code requirements MUST be tied to the resolved binary hash (`fileHash`
 Development MUST be driven by formal specifications. No implementation should begin without a peer-reviewed (or AI-validated) Specification and Implementation Plan. This ensures that features are built against clear requirements and that the resulting code is testable and maintainable.
 
 ### V. Continuous Quality (Linting, Testing & Hooks)
-All code MUST adhere to the project's linting and formatting standards (e.g., Ruff). All new functionality MUST include appropriate unit tests with meaningful coverage. Quality checks (linting, formatting, and tests) MUST be enforced via git commit hooks (pre-commit) to prevent substandard code from entering the repository history.
+All code MUST adhere to the project's linting and formatting standards (e.g., Ruff). All new functionality MUST include appropriate unit tests with meaningful coverage using pytest. Code coverage SHOULD be maintained above 80% for all modules, with a best-effort approach to Test-Driven Development (TDD): write tests before or alongside implementation. Quality checks (linting, formatting, and tests) MUST be enforced via git commit hooks (pre-commit) to prevent substandard code from entering the repository history.
 
 ### VI. Reproducibility and Dependency Integrity
 Every tool, library, or utility used in the development or execution of the project MUST be explicitly declared in the project's dependency management file (`pyproject.toml`). The environment MUST be fully reproducible from a fresh clone using only declared dependencies; "global" or "system-wide" tool assumptions are prohibited.
@@ -45,7 +46,7 @@ Every tool, library, or utility used in the development or execution of the proj
 - **Runtime**: MUST use Python 3.13+ as the primary scripting engine.
 - **Privileges**: Interactions with the Little Snitch CLI (`littlesnitch`) require `sudo` elevation.
 - **Backups**: Backups MUST be stored in a persistent user directory (`~/.ls_backups`).
-- **Testing**: All code contributions MUST include appropriate unit tests using pytest.
+- **Testing**: All code contributions MUST include appropriate unit tests using pytest. Minimum test coverage target is 80% per module. TDD approach is strongly encouraged: write tests before or alongside implementation.
 
 ## Development Workflow
 
