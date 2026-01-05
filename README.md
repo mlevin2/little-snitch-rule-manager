@@ -9,6 +9,7 @@ A CLI tool for managing Little Snitch rules on macOS, specifically optimized for
 - **Automated Rule Management**: Add or update Little Snitch rules via the command line.
 - **Hash Management**: Automatically calculates SHA256 hashes of binaries and updates Little Snitch `codeRequirements`.
 - **Enforced `fileHash` Type**: Automatically converts `trustedAnchor` requirements to `fileHash` to support binaries without stable team identifiers. This is particularly useful for fixing issues where Little Snitch rejects rules for Homebrew-installed binaries (like `mosh-server`) because their `authorIdentifier` is just a hash instead of a valid Apple Team ID.
+- **User-Specific Rules**: Creates rules with the `uid` field set to the current user, making them editable in Little Snitch UI without requiring "Allow Global Rule Editing" permission.
 - **Safety First**: Automatically exports a backup of your Little Snitch configuration to `~/.ls_backups/` before making any modifications.
 - **Symlink Support**: Correctly resolves symlinks (common with Homebrew) to ensure the actual binary is hashed.
 
@@ -21,6 +22,7 @@ A CLI tool for managing Little Snitch rules on macOS, specifically optimized for
     - It updates the hash in the requirement.
     - If the requirement type is not `fileHash`, it converts it and removes any `authorIdentifier`.
 5. **Rule Update**: It adds or replaces a rule for the specified binary, ports, and protocol.
+    - Rules are created as **user-specific** (with `uid` field set) rather than global rules, making them editable in the Little Snitch UI without requiring "Allow Global Rule Editing" permission.
 6. **Restore**: It tells Little Snitch to restore the model from the modified JSON.
 
 ## Prerequisites

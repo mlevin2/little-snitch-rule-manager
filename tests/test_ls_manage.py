@@ -223,6 +223,52 @@ class TestUpdateRule:
                 with pytest.raises(SystemExit):
                     ls_manage.update_rule(args)
 
+    @patch("ls_manage.restore_config")
+    @patch("ls_manage.export_config")
+    @patch("ls_manage.get_binary_hash")
+    @patch("os.path.realpath")
+    def test_update_rule_sets_uid_field(self, mock_realpath, mock_hash, mock_export, mock_restore):
+        """Test that update_rule sets uid field to make rules user-specific"""
+        args = MagicMock()
+        args.path = "/usr/local/bin/test"
+        args.ports = "8080"
+        args.protocol = "tcp"
+        args.direction = "outgoing"
+        args.remote = "any"
+        args.replace = False
+
+        with patch("os.path.exists", return_value=True):
+            mock_realpath.return_value = "/usr/local/bin/test"
+            mock_hash.return_value = "testhash123"
+
+            config = {"codeRequirements": {}, "rules": []}
+            modified_config = None
+
+            def export_side_effect(path):
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, "w") as f:
+                    json.dump(config, f)
+
+            def restore_side_effect(path):
+                nonlocal modified_config
+                with open(path) as f:
+                    modified_config = json.load(f)
+
+            mock_export.side_effect = export_side_effect
+            mock_restore.side_effect = restore_side_effect
+
+            with patch("ls_manage.find_code_requirement_key", return_value=None):
+                with patch("shutil.which", return_value="/usr/local/bin/test"):
+                    ls_manage.update_rule(args)
+
+            # Verify that the modified config has a rule with uid field
+            assert modified_config is not None
+            assert len(modified_config["rules"]) == 1
+            rule = modified_config["rules"][0]
+            assert "uid" in rule
+            assert rule["uid"] == os.getuid()
+            assert rule["uid"] is not None
+
 
 class TestConfigJSON:
     """Tests for JSON config manipulation"""
@@ -249,6 +295,7 @@ class TestConfigJSON:
             "protocol": "tcp",
             "direction": "outgoing",
             "remote": "any",
+            "uid": os.getuid(),
             "origin": "frontend",
             "creationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "modificationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -261,6 +308,29 @@ class TestConfigJSON:
             "protocol",
             "direction",
             "remote",
+            "uid",
         ]
         for field in required_fields:
             assert field in rule
+
+    def test_rule_has_uid_field(self):
+        """Test that created rules include uid field to make them user-specific"""
+        from datetime import datetime
+
+        rule = {
+            "action": "allow",
+            "process": "/usr/local/bin/example",
+            "ports": "8080",
+            "protocol": "tcp",
+            "direction": "outgoing",
+            "remote": "any",
+            "uid": os.getuid(),
+            "origin": "frontend",
+            "creationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "modificationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+
+        # Verify uid field exists and is set to current user's UID
+        assert "uid" in rule
+        assert rule["uid"] == os.getuid()
+        assert rule["uid"] is not None

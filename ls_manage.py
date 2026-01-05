@@ -154,6 +154,8 @@ def update_rule(args):
     rules = config.get("rules", [])
 
     # Define the new rule object
+    # Include uid to make this a user-specific rule (not a global rule)
+    # Global rules (uid: null) require "Allow Global Rule Editing" permission
     new_rule = {
         "action": "allow",
         "process": binary_path,  # Use the path provided (e.g. symlink)
@@ -161,6 +163,7 @@ def update_rule(args):
         "protocol": args.protocol,
         "direction": args.direction,
         "remote": args.remote,
+        "uid": os.getuid(),  # Current user's UID - makes rule user-specific
         "origin": "frontend",
         "creationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "modificationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
