@@ -34,6 +34,7 @@ env/
 .idea/
 *.swp
 *.swo
+.claude/
 
 # Logs and Temps
 *.log
