@@ -114,3 +114,35 @@ The GitHub Actions CI pipeline (`.github/workflows/lint.yml`) runs on all push a
 ### Branching & Merging
 - **Branches**: MUST use the `NNN-short-description` format.
 - **Merging**: MUST use `--no-ff` when merging to `main`.
+
+## Technical Notes
+
+### Rule Ownership: `uid` vs `owner` Fields
+
+Little Snitch rules use one of two mutually exclusive fields to determine which processes they match:
+
+- **`uid: 501`** - User-specific rules that match processes owned by a specific user (by UID)
+- **`owner: "system"`** or **`owner: "anyone"`** - Global rules that match system processes or all users
+
+**Important findings:**
+- Rules created through the Little Snitch UI (via connection alerts or manual creation) **always** set either `uid` or `owner`
+- Rules with neither field set appear **grayed-out and non-editable** in the Little Snitch UI
+- Editing global rules (those with `owner` set) requires enabling "Allow Global Rule Editing" in Little Snitch → Settings → Security
+
+**This tool's behavior:**
+- Creates user-specific rules (sets `uid` to current user's UID)
+- Appropriate for single-user systems where services like `mosh-server` run as the logged-in user
+- For multi-user systems, consider using `owner: "anyone"` for shared services (requires manual editing of the tool)
+
+### Orphaned SHA256-Based Rules
+
+Little Snitch may create duplicate rules when a binary makes a network connection:
+1. A path-based rule: `"/usr/local/opt/python@3.14/..."`
+2. A hash-based rule: `"identifier.SHA256/eca83a8b..."`
+
+When binaries are updated (e.g., via Homebrew), the hash-based rules become orphaned - they reference a binary hash that no longer exists. These rules are:
+- **Harmless** - they won't match anything since the binary hash has changed
+- **Unused** - Little Snitch will use the path-based rule instead
+- **Cleanable** - safe to delete manually if desired
+
+The tool updates `codeRequirements` to keep path-based rules working across binary updates, but hash-based rules may accumulate over time.
