@@ -146,3 +146,7 @@ When binaries are updated (e.g., via Homebrew), the hash-based rules become orph
 - **Cleanable** - safe to delete manually if desired
 
 The tool updates `codeRequirements` to keep path-based rules working across binary updates, but hash-based rules may accumulate over time.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
