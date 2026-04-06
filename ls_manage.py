@@ -87,46 +87,14 @@ def find_code_requirement_key(config, binary_path):
     return None
 
 
-def update_rule(args):
-    binary_path = args.path
-    if not os.path.exists(binary_path):
-        binary_path = shutil.which(binary_path)
-        if not binary_path:
-            print(f"Error: Could not find binary: {args.path}")
-            sys.exit(1)
-
-    print(f"Processing binary: {binary_path}")
-    resolved_path = os.path.realpath(binary_path)
-    print(f"Resolved path: {resolved_path}")
-
-    new_hash = get_binary_hash(resolved_path)
-    print(f"Calculated Hash: {new_hash}")
-
-    # Create persistent backup directory
-    backup_dir = os.path.expanduser("~/.ls_backups")
-    os.makedirs(backup_dir, exist_ok=True)
-
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    backup_file = os.path.join(backup_dir, f"ls_backup_{timestamp}.json")
-    # Keep the modified file in tmp as it's transient
-    modified_file = f"/tmp/ls_modified_{timestamp}.json"
-
-    export_config(backup_file)
-    print(f"✅ Backup saved to: {backup_file}")
-
-    with open(backup_file) as f:
-        config = json.load(f)
-
-    # 1. Update Code Requirements (Trusted Anchors)
+def _update_code_requirements(config, binary_path, resolved_path, new_hash):
+    """Mutate config: ensure codeRequirements entry for resolved_path has correct fileHash."""
     cr_key = find_code_requirement_key(config, binary_path)
 
     if cr_key:
         print(f"Found existing code requirement key: {cr_key}")
         current_cr = config["codeRequirements"][cr_key]
 
-        # Enforce fileHash type.
-        # Issue fix: mosh-server was previously set as "trustedAnchor" with a SHA256 hash,
-        # which is invalid.
         if current_cr.get("type") != "fileHash":
             print(f"Fixing type: Changing {current_cr.get('type')} to fileHash")
             current_cr["type"] = "fileHash"
@@ -143,45 +111,35 @@ def update_rule(args):
             f"No existing code requirement found. "
             f"Creating new 'fileHash' requirement for {resolved_path}"
         )
-        # Ensure codeRequirements dict exists
         if "codeRequirements" not in config:
             config["codeRequirements"] = {}
 
         config["codeRequirements"][resolved_path] = {"type": "fileHash", "codeIdentifier": new_hash}
 
-    # 2. Add/Update Rule
-    # Check if a rule already exists for this process
-    rules = config.get("rules", [])
 
-    # Define the new rule object
-    # Include uid to make this a user-specific rule (not a global rule)
-    # Global rules (uid: null) require "Allow Global Rule Editing" permission
-    new_rule = {
-        "action": "allow",
-        "process": binary_path,  # Use the path provided (e.g. symlink)
-        "ports": args.ports,
-        "protocol": args.protocol,
-        "direction": args.direction,
-        "remote": args.remote,
-        "uid": os.getuid(),  # Current user's UID - makes rule user-specific
-        "origin": "frontend",
-        "creationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "modificationDate": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-    }
+def _rule_timestamp_fields():
+    now = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    return {"creationDate": now, "modificationDate": now}
 
-    # Remove existing rules for this process if requested or update them
-    # For now, let's just append the new rule if not exact duplicate
-    # Or maybe filter out old rules for this process?
 
-    # Simple approach: Remove rules matching this process and add new one
-    if args.replace:
-        print(f"Removing existing rules for {binary_path}...")
-        config["rules"] = [r for r in rules if r.get("process") != binary_path]
+def _export_backup_and_load_config():
+    backup_dir = os.path.expanduser("~/.ls_backups")
+    os.makedirs(backup_dir, exist_ok=True)
 
-    print("Adding new rule...")
-    config["rules"].append(new_rule)
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    backup_file = os.path.join(backup_dir, f"ls_backup_{timestamp}.json")
+    modified_file = f"/tmp/ls_modified_{timestamp}.json"
 
-    # Save modified config
+    export_config(backup_file)
+    print(f"✅ Backup saved to: {backup_file}")
+
+    with open(backup_file) as f:
+        config = json.load(f)
+
+    return config, backup_file, modified_file
+
+
+def _restore_config_or_revert(config, modified_file, backup_file):
     with open(modified_file, "w") as f:
         json.dump(config, f, indent=2)
 
@@ -199,6 +157,49 @@ def update_rule(args):
     print("To undo this change, run the following command:")
     print(f'sudo "{LS_CMD}" -u {USER} restore-model "{backup_file}"')
     print("----------------------------------------------------------------")
+
+
+def update_rule(args):
+    binary_path = args.path
+    if not os.path.exists(binary_path):
+        binary_path = shutil.which(args.path)
+        if not binary_path:
+            print(f"Error: Could not find binary: {args.path}")
+            sys.exit(1)
+
+    print(f"Processing binary: {binary_path}")
+    resolved_path = os.path.realpath(binary_path)
+    print(f"Resolved path: {resolved_path}")
+
+    new_hash = get_binary_hash(resolved_path)
+    print(f"Calculated Hash: {new_hash}")
+
+    config, backup_file, modified_file = _export_backup_and_load_config()
+
+    _update_code_requirements(config, binary_path, resolved_path, new_hash)
+
+    rules = config.get("rules", [])
+
+    new_rule = {
+        "action": "allow",
+        "process": binary_path,  # Use the path provided (e.g. symlink)
+        "ports": args.ports,
+        "protocol": args.protocol,
+        "direction": args.direction,
+        "remote": args.remote,
+        "uid": os.getuid(),  # Current user's UID - makes rule user-specific
+        "origin": "frontend",
+        **_rule_timestamp_fields(),
+    }
+
+    if args.replace:
+        print(f"Removing existing rules for {binary_path}...")
+        config["rules"] = [r for r in rules if r.get("process") != binary_path]
+
+    print("Adding new rule...")
+    config["rules"].append(new_rule)
+
+    _restore_config_or_revert(config, modified_file, backup_file)
 
 
 def main():
